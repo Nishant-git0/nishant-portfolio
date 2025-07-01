@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { apiEndpoints } from '../../services/api'; // ✅ Import your API service
+import { apiEndpoints } from '../../services/api'; 
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -156,7 +156,7 @@ const AdminDashboard = () => {
                 type="email"
                 value={loginData.email}
                 onChange={(e) => setLoginData({...loginData, email: e.target.value})}
-                placeholder="truthking68@gmail.com"
+                placeholder="admin@gmail.com"
                 required
               />
             </div>

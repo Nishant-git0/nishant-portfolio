@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with dynamic base URL
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+  baseURL: process.env.REACT_APP_API_URL || 'https://nishant-portfolio-backend.onrender.com/api',
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json'
