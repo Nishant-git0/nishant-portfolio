@@ -1,5 +1,6 @@
 {
   "name": "nishant-portfolio",
+  "homepage": "https://nishant-portfolio-frontend.onrender.com",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
