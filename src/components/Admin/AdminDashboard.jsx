@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { apiEndpoints } from '../../services/api';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -12,6 +11,9 @@ const AdminDashboard = () => {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [emailTestResult, setEmailTestResult] = useState('');
+
+  // Get API base URL
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
   useEffect(() => {
     // Check if user is already authenticated
@@ -28,7 +30,7 @@ const AdminDashboard = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/admin/login', {
+      const response = await fetch(`${API_BASE_URL}/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -46,7 +48,8 @@ const AdminDashboard = () => {
         setError(data.message || 'Login failed');
       }
     } catch (error) {
-      setError('Login failed. Please check your connection.');
+      console.error('Login error:', error);
+      setError('Login failed. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -55,7 +58,7 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch('http://localhost:5000/api/admin/dashboard', {
+      const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -64,6 +67,8 @@ const AdminDashboard = () => {
       if (response.ok) {
         const data = await response.json();
         setDashboardData(data.data);
+      } else {
+        console.error('Failed to fetch dashboard data');
       }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
@@ -73,7 +78,7 @@ const AdminDashboard = () => {
   const fetchContacts = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch('http://localhost:5000/api/admin/contacts', {
+      const response = await fetch(`${API_BASE_URL}/admin/contacts`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -88,10 +93,11 @@ const AdminDashboard = () => {
     }
   };
 
+  // ✅ ADD THIS MISSING FUNCTION:
   const handleContactClick = async (contactId) => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/admin/contacts/${contactId}`, {
+      const response = await fetch(`${API_BASE_URL}/admin/contacts/${contactId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -106,10 +112,11 @@ const AdminDashboard = () => {
     }
   };
 
+  // ✅ ADD THIS MISSING FUNCTION:
   const updateContactStatus = async (contactId, status) => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/admin/contacts/${contactId}/status`, {
+      const response = await fetch(`${API_BASE_URL}/admin/contacts/${contactId}/status`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -120,7 +127,7 @@ const AdminDashboard = () => {
 
       if (response.ok) {
         fetchContacts();
-        if (selectedContact && selectedContact.id === contactId) {
+        if (selectedContact && selectedContact._id === contactId) {
           setSelectedContact({ ...selectedContact, status });
         }
       }
@@ -129,6 +136,7 @@ const AdminDashboard = () => {
     }
   };
 
+  // ✅ ADD THIS MISSING FUNCTION:
   const deleteContact = async (contactId) => {
     if (!window.confirm('Are you sure you want to delete this contact?')) {
       return;
@@ -136,7 +144,7 @@ const AdminDashboard = () => {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/admin/contacts/${contactId}`, {
+      const response = await fetch(`${API_BASE_URL}/admin/contacts/${contactId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -155,7 +163,7 @@ const AdminDashboard = () => {
   const testEmail = async () => {
     setEmailTestResult('Sending test email...');
     try {
-      const response = await fetch('http://localhost:5000/api/test-email', {
+      const response = await fetch(`${API_BASE_URL}/test-email`, {
         method: 'POST'
       });
 
@@ -206,7 +214,7 @@ const AdminDashboard = () => {
                 type="email"
                 value={loginData.email}
                 onChange={(e) => setLoginData({...loginData, email: e.target.value})}
-                placeholder="admin@portfolio.com"
+                placeholder="truthking68@gmail.com"
                 required
               />
             </div>
@@ -228,7 +236,6 @@ const AdminDashboard = () => {
           </form>
           
           <div className="login-footer">
-           <p>Use your admin credentials: {process.env.REACT_APP_ADMIN_EMAIL || 'truthking68@gmail.com'} / admin123</p>
           </div>
         </div>
       </div>
@@ -320,10 +327,10 @@ const AdminDashboard = () => {
             
             <div className="recent-contacts">
               <h3>📋 Latest Contacts</h3>
-              {dashboardData.latestContacts.length > 0 ? (
+              {dashboardData.latestContacts && dashboardData.latestContacts.length > 0 ? (
                 <div className="contacts-list">
                   {dashboardData.latestContacts.map(contact => (
-                    <div key={contact.id} className="contact-item">
+                    <div key={contact._id} className="contact-item">
                       <div className="contact-info">
                         <h4>{contact.name}</h4>
                         <p>{contact.email}</p>
@@ -337,7 +344,7 @@ const AdminDashboard = () => {
                           {contact.status}
                         </span>
                         <span className="contact-date">
-                          {formatDate(contact.timestamp)}
+                          {formatDate(contact.createdAt)}
                         </span>
                       </div>
                     </div>
@@ -364,9 +371,9 @@ const AdminDashboard = () => {
                 {contacts.length > 0 ? (
                   contacts.map(contact => (
                     <div 
-                      key={contact.id} 
-                      className={`contact-card ${selectedContact?.id === contact.id ? 'selected' : ''}`}
-                      onClick={() => handleContactClick(contact.id)}
+                      key={contact._id} 
+                      className={`contact-card ${selectedContact?._id === contact._id ? 'selected' : ''}`}
+                      onClick={() => handleContactClick(contact._id)}
                     >
                       <div className="contact-header">
                         <h4>{contact.name}</h4>
@@ -379,7 +386,7 @@ const AdminDashboard = () => {
                       </div>
                       <p className="contact-email">{contact.email}</p>
                       <p className="contact-subject">{contact.subject}</p>
-                      <p className="contact-date">{formatDate(contact.timestamp)}</p>
+                      <p className="contact-date">{formatDate(contact.createdAt)}</p>
                     </div>
                   ))
                 ) : (
@@ -395,7 +402,7 @@ const AdminDashboard = () => {
                       <div className="contact-actions">
                         <select 
                           value={selectedContact.status}
-                          onChange={(e) => updateContactStatus(selectedContact.id, e.target.value)}
+                          onChange={(e) => updateContactStatus(selectedContact._id, e.target.value)}
                           className="status-select"
                         >
                           <option value="new">New</option>
@@ -403,7 +410,7 @@ const AdminDashboard = () => {
                           <option value="replied">Replied</option>
                         </select>
                         <button 
-                          onClick={() => deleteContact(selectedContact.id)}
+                          onClick={() => deleteContact(selectedContact._id)}
                           className="delete-btn"
                         >
                           🗑️ Delete
@@ -430,7 +437,7 @@ const AdminDashboard = () => {
                       </div>
                       <div className="info-item">
                         <label>🕒 Received:</label>
-                        <span>{formatDate(selectedContact.timestamp)}</span>
+                        <span>{formatDate(selectedContact.createdAt)}</span>
                       </div>
                       <div className="info-item">
                         <label>🌐 IP Address:</label>
@@ -444,7 +451,6 @@ const AdminDashboard = () => {
                         {selectedContact.message}
                       </div>
                     </div>
-                    
                     <div className="reply-section">
                       <a 
                         href={`mailto:${selectedContact.email}?subject=Re: ${selectedContact.subject}`}
@@ -454,18 +460,18 @@ const AdminDashboard = () => {
                       </a>
                     </div>
                   </div>
-                                ) : (
-                                  <div className="no-selection">
-                                    <p>📧 Select a contact to view details</p>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                };
-                
-                export default AdminDashboard;
+                ) : (
+                  <div className="no-selection">
+                    <p>📧 Select a contact to view details</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;

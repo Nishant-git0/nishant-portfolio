@@ -66,6 +66,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Portfolio />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/*" element={<AdminDashboard />} />
+          {/* Catch all route */}
+          <Route path="*" element={<Portfolio />} />
         </Routes>
       </div>
     </Router>
