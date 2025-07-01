@@ -79,5 +79,7 @@ export const portfolioData = {
     { name: "Skills", href: "#skills" },
     { name: "Projects", href: "#projects" },
     { name: "Contact", href: "#contact" }
-  ]
+  ],
+  
+  adminNavigation: { name: "Admin", href: "/admin" }
 };
