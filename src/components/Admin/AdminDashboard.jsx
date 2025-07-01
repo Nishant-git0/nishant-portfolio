@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiEndpoints } from '../../services/api'; // ✅ Import your API service
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -11,9 +12,6 @@ const AdminDashboard = () => {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [emailTestResult, setEmailTestResult] = useState('');
-
-  // Get API base URL
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
   useEffect(() => {
     // Check if user is already authenticated
@@ -30,22 +28,15 @@ const AdminDashboard = () => {
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(loginData)
-      });
-
-      const data = await response.json();
+      // ✅ Use apiEndpoints instead of fetch
+      const response = await apiEndpoints.adminLogin(loginData);
       
-      if (data.success) {
-        localStorage.setItem('adminToken', data.data.token);
+      if (response.data.success) {
+        localStorage.setItem('adminToken', response.data.data.token);
         setIsAuthenticated(true);
         fetchDashboardData();
       } else {
-        setError(data.message || 'Login failed');
+        setError(response.data.message || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -57,19 +48,9 @@ const AdminDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setDashboardData(data.data);
-      } else {
-        console.error('Failed to fetch dashboard data');
-      }
+      // ✅ Use apiEndpoints
+      const response = await apiEndpoints.getDashboard();
+      setDashboardData(response.data.data);
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     }
@@ -77,84 +58,47 @@ const AdminDashboard = () => {
 
   const fetchContacts = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${API_BASE_URL}/admin/contacts`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setContacts(data.data.contacts);
-      }
+      // ✅ Use apiEndpoints
+      const response = await apiEndpoints.getContacts();
+      setContacts(response.data.data.contacts);
     } catch (error) {
       console.error('Failed to fetch contacts:', error);
     }
   };
 
-  // ✅ ADD THIS MISSING FUNCTION:
   const handleContactClick = async (contactId) => {
     try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${API_BASE_URL}/admin/contacts/${contactId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setSelectedContact(data.data);
-      }
+      // ✅ Use apiEndpoints
+      const response = await apiEndpoints.getContact(contactId);
+      setSelectedContact(response.data.data);
     } catch (error) {
       console.error('Failed to fetch contact details:', error);
     }
   };
 
-  // ✅ ADD THIS MISSING FUNCTION:
   const updateContactStatus = async (contactId, status) => {
     try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${API_BASE_URL}/admin/contacts/${contactId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status })
-      });
-
-      if (response.ok) {
-        fetchContacts();
-        if (selectedContact && selectedContact._id === contactId) {
-          setSelectedContact({ ...selectedContact, status });
-        }
+      // ✅ Use apiEndpoints
+      await apiEndpoints.updateContactStatus(contactId, { status });
+      fetchContacts();
+      if (selectedContact && selectedContact._id === contactId) {
+        setSelectedContact({ ...selectedContact, status });
       }
     } catch (error) {
       console.error('Failed to update contact status:', error);
     }
   };
 
-  // ✅ ADD THIS MISSING FUNCTION:
   const deleteContact = async (contactId) => {
     if (!window.confirm('Are you sure you want to delete this contact?')) {
       return;
     }
 
     try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${API_BASE_URL}/admin/contacts/${contactId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        fetchContacts();
-        setSelectedContact(null);
-      }
+      // ✅ Use apiEndpoints
+      await apiEndpoints.deleteContact(contactId);
+      fetchContacts();
+      setSelectedContact(null);
     } catch (error) {
       console.error('Failed to delete contact:', error);
     }
@@ -163,16 +107,14 @@ const AdminDashboard = () => {
   const testEmail = async () => {
     setEmailTestResult('Sending test email...');
     try {
-      const response = await fetch(`${API_BASE_URL}/test-email`, {
-        method: 'POST'
-      });
-
-      const data = await response.json();
-      setEmailTestResult(data.success ? '✅ Test email sent successfully!' : '❌ ' + data.message);
+      // ✅ Use apiEndpoints
+      const response = await apiEndpoints.testEmail();
+      setEmailTestResult(response.data.success ? '✅ Test email sent successfully!' : '❌ ' + response.data.message);
     } catch (error) {
       setEmailTestResult('❌ Failed to send test email');
     }
   };
+
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
