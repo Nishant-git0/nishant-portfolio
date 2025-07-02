@@ -1,27 +1,7 @@
 import React from 'react';
-import { apiEndpoints } from '../../services/api';
 
 const ProjectCard = ({ project, index, isVisible }) => {
   const { id, title, description, technologies, gradient, demoUrl, sourceUrl } = project;
-
-  const trackProjectClick = async (linkType, url) => {
-    try {
-      const sessionId = sessionStorage.getItem('sessionId') || `session_${Date.now()}`;
-      
-      await apiEndpoints.trackProjectClick({
-        projectId: id,
-        projectName: title,
-        linkType,
-        sessionId,
-        metadata: {
-          clickTime: new Date().toISOString(),
-          url
-        }
-      });
-    } catch (error) {
-      console.error('Failed to track project click:', error);
-    }
-  };
 
   const handleLinkClick = (url, linkType, e) => {
     if (url === '#') {
@@ -29,9 +9,6 @@ const ProjectCard = ({ project, index, isVisible }) => {
       alert('Demo/Source link will be available soon!');
       return;
     }
-
-    // Track the click
-    trackProjectClick(linkType, url);
   };
 
   return (

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { portfolioData } from '../../data/portfolioData';
 import { useScrollAnimation } from '../../hooks/useScrollAnimation';
-import { apiEndpoints } from '../../services/api';
 import './Contact.css';
 
 const Contact = () => {
@@ -56,7 +55,7 @@ const Contact = () => {
     return errors;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('');
@@ -71,49 +70,19 @@ const Contact = () => {
       return;
     }
 
-    try {
-      console.log('Submitting form data:', formData);
-      
-      const response = await apiEndpoints.submitContact(formData);
-      
-      if (response.data.success) {
-        setSubmitStatus('success');
-        setSubmitMessage(response.data.message);
-        setFormData({ name: '', email: '', subject: '', message: '' });
-        
-        // Auto-hide success message after 5 seconds
-        setTimeout(() => {
-          setSubmitStatus('');
-          setSubmitMessage('');
-        }, 5000);
-      } else {
-        throw new Error(response.data.message || 'Failed to send message');
-      }
-    } catch (error) {
-      console.error('Contact form submission error:', error);
-      setSubmitStatus('error');
-      
-      if (error.response?.data?.errors) {
-        // Handle backend validation errors
-        const backendErrors = {};
-        error.response.data.errors.forEach(err => {
-          const field = err.path || err.param;
-          if (field) {
-            backendErrors[field] = err.msg;
-          }
-        });
-        setValidationErrors(backendErrors);
-        setSubmitMessage('Please fix the errors below');
-      } else if (error.response?.data?.message) {
-        setSubmitMessage(error.response.data.message);
-      } else if (error.response?.status === 429) {
-        setSubmitMessage('Too many requests. Please try again later.');
-      } else {
-        setSubmitMessage('Failed to send message. Please try again later.');
-      }
-    } finally {
+    // Simulate form submission
+    setTimeout(() => {
+      setSubmitStatus('success');
+      setSubmitMessage('Thank you for your message! I\'ll get back to you soon.');
+      setFormData({ name: '', email: '', subject: '', message: '' });
       setIsSubmitting(false);
-    }
+      
+      // Auto-hide success message after 5 seconds
+      setTimeout(() => {
+        setSubmitStatus('');
+        setSubmitMessage('');
+      }, 5000);
+    }, 1000);
   };
 
   return (

@@ -80,6 +80,5 @@ export const portfolioData = {
     { name: "Projects", href: "#projects" },
     { name: "Contact", href: "#contact" }
   ],
-  
-  adminNavigation: { name: "Admin", href: "/admin" }
+
 };

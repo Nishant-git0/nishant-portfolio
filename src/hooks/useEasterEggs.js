@@ -1,25 +1,8 @@
 import { useEffect, useState } from 'react';
-import { apiEndpoints } from '../services/api';
 
 export const useEasterEggs = () => {
   const [easterEggActive, setEasterEggActive] = useState(false);
   const [secretMessage, setSecretMessage] = useState('');
-
-  const trackEasterEgg = async (easterEggType) => {
-    try {
-      const sessionId = sessionStorage.getItem('sessionId') || `session_${Date.now()}`;
-      
-      await apiEndpoints.trackEasterEgg({
-        easterEggType,
-        sessionId,
-        metadata: {
-          discoveredAt: new Date().toISOString()
-        }
-      });
-    } catch (error) {
-      console.error('Failed to track easter egg:', error);
-    }
-  };
 
   useEffect(() => {
     // Konami Code: ↑↑↓↓←→←→BA
@@ -29,15 +12,10 @@ export const useEasterEggs = () => {
     let clickTimer = null;
     let secretWordBuffer = '';
 
-    const showEasterEgg = (message, type = 'konami', easterEggType) => {
+    const showEasterEgg = (message, type = 'konami') => {
       console.log('Easter egg triggered:', message);
       setSecretMessage(message);
       setEasterEggActive(true);
-      
-      // Track the easter egg discovery
-      if (easterEggType) {
-        trackEasterEgg(easterEggType);
-      }
       
       // Add special effects
       document.body.classList.add(`easter-egg-${type}`);
@@ -58,7 +36,7 @@ export const useEasterEggs = () => {
       }
       
       if (JSON.stringify(userInput) === JSON.stringify(konamiCode)) {
-        showEasterEgg('🎉 Konami Code Activated! You are a true gamer! 🎮', 'konami', 'konami_code');
+        showEasterEgg('🎉 Konami Code Activated! You are a true gamer! 🎮', 'konami');
         userInput = [];
         return;
       }
@@ -74,16 +52,16 @@ export const useEasterEggs = () => {
 
         // Check for secret words
         if (secretWordBuffer.includes('nishant')) {
-          showEasterEgg('👨‍💻 You typed my name! Thanks for paying attention! 🙏', 'click', 'secret_word_nishant');
+          showEasterEgg('👨‍💻 You typed my name! Thanks for paying attention! 🙏', 'click');
           secretWordBuffer = '';
         } else if (secretWordBuffer.includes('developer')) {
-          showEasterEgg('💻 Developer mode activated! You know the magic word! ⚡', 'click', 'secret_word_developer');
+          showEasterEgg('💻 Developer mode activated! You know the magic word! ⚡', 'click');
           secretWordBuffer = '';
         } else if (secretWordBuffer.includes('portfolio')) {
-          showEasterEgg('📁 Portfolio explorer! You are really engaged! 🔍', 'click', 'secret_word_portfolio');
+          showEasterEgg('📁 Portfolio explorer! You are really engaged! 🔍', 'click');
           secretWordBuffer = '';
         } else if (secretWordBuffer.includes('secret')) {
-          showEasterEgg('🤫 Shh... you found the secret word! Well done! 🕵️', 'click', 'secret_word_secret');
+          showEasterEgg('🤫 Shh... you found the secret word! Well done! 🕵️', 'click');
           secretWordBuffer = '';
         }
       }
@@ -91,7 +69,7 @@ export const useEasterEggs = () => {
       // Special key combinations
       if (e.ctrlKey && e.shiftKey && e.key === 'I') {
         e.preventDefault();
-        showEasterEgg('🔧 Developer tools detected! You know your way around! 👨‍💻', 'click', 'dev_tools');
+        showEasterEgg('🔧 Developer tools detected! You know your way around! 👨‍💻', 'click');
       }
     };
 
@@ -105,7 +83,7 @@ export const useEasterEggs = () => {
       
       clickTimer = setTimeout(() => {
         if (clickCount >= 7) {
-          showEasterEgg('🚀 Logo master! You discovered the click combo! 💫', 'click', 'logo_clicks');
+          showEasterEgg('🚀 Logo master! You discovered the click combo! 💫', 'click');
         } else if (clickCount >= 3) {
           console.log(`${clickCount} clicks... keep going!`);
         }
@@ -119,7 +97,7 @@ export const useEasterEggs = () => {
       const currentTime = new Date().getTime();
       if (currentTime - lastClickTime < 300) {
         if (Math.random() < 0.1) { // 10% chance
-          showEasterEgg('⚡ Lightning fast! You triggered a rare double-click easter egg! 🎯', 'click', 'double_click');
+          showEasterEgg('⚡ Lightning fast! You triggered a rare double-click easter egg! 🎯', 'click');
         }
       }
       lastClickTime = currentTime;
@@ -151,8 +129,6 @@ export const useEasterEggs = () => {
       if (logo) {
         logo.removeEventListener('click', handleLogoClick);
       }
-      
-     
     };
   }, []);
 
