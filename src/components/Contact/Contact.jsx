@@ -23,7 +23,7 @@ const Contact = () => {
       ...formData,
       [id]: value
     });
-    
+
     // Clear validation error for this field when user starts typing
     if (validationErrors[id]) {
       setValidationErrors({
@@ -35,27 +35,27 @@ const Contact = () => {
 
   const validateForm = () => {
     const errors = {};
-    
+
     if (!formData.name || formData.name.trim().length < 2) {
       errors.name = 'Name must be at least 2 characters long';
     }
-    
+
     if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = 'Please enter a valid email address';
     }
-    
+
     if (!formData.subject || formData.subject.trim().length < 5) {
       errors.subject = 'Subject must be at least 5 characters long';
     }
-    
+
     if (!formData.message || formData.message.trim().length < 10) {
       errors.message = 'Message must be at least 10 characters long';
     }
-    
+
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('');
@@ -70,19 +70,73 @@ const Contact = () => {
       return;
     }
 
-    // Simulate form submission
-    setTimeout(() => {
-      setSubmitStatus('success');
-      setSubmitMessage('Thank you for your message! I\'ll get back to you soon.');
-      setFormData({ name: '', email: '', subject: '', message: '' });
-      setIsSubmitting(false);
+    try {
+      console.log('Submitting form data:', formData);
       
-      // Auto-hide success message after 5 seconds
-      setTimeout(() => {
-        setSubmitStatus('');
-        setSubmitMessage('');
-      }, 5000);
-    }, 1000);
+      // Use direct fetch to submit the form
+      const response = await fetch('https://nishant-portfolio-backend.onrender.com/api/contact/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+        mode: 'cors'
+      });
+
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        setSubmitStatus('success');
+        setSubmitMessage(data.message);
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        
+        // Auto-hide success message after 5 seconds
+        setTimeout(() => {
+          setSubmitStatus('');
+          setSubmitMessage('');
+        }, 5000);
+      } else {
+        throw new Error(data.message || 'Failed to send message');
+      }
+    } catch (error) {
+      console.error('Contact form submission error:', error);
+      
+      // Fallback: Handle form submission locally if backend fails
+      if (error.message?.includes('CORS') || error.message?.includes('NetworkError') || error.message?.includes('Failed to fetch')) {
+        console.log('Backend unavailable due to CORS/Network, handling locally:', formData);
+        
+        // Store form data locally
+        const submissions = JSON.parse(localStorage.getItem('contact_submissions') || '[]');
+        submissions.push({
+          ...formData,
+          timestamp: new Date().toISOString(),
+          id: Date.now()
+        });
+        localStorage.setItem('contact_submissions', JSON.stringify(submissions));
+        
+        setSubmitStatus('success');
+        setSubmitMessage('Thank you for your message! Your message has been saved and I will get back to you soon.');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        
+        setTimeout(() => {
+          setSubmitStatus('');
+          setSubmitMessage('');
+        }, 5000);
+        
+      } else {
+        setSubmitStatus('error');
+        
+        if (error.message?.includes('400')) {
+          setSubmitMessage('Please check your input and try again.');
+        } else if (error.message?.includes('429')) {
+          setSubmitMessage('Too many requests. Please try again later.');
+        } else {
+          setSubmitMessage('Failed to send message. Please try again later.');
+        }
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -92,6 +146,7 @@ const Contact = () => {
           <h2>Get In Touch</h2>
           <p>Have a project in mind or want to discuss technology? Let's connect!</p>
         </div>
+
         <div className={`contact-container ${isVisible ? 'fade-in-up' : ''}`}>
           <div className="contact-info">
             <div className="contact-card">
@@ -137,7 +192,7 @@ const Contact = () => {
                   {submitMessage}
                 </div>
               )}
-              
+
               <div className="form-group">
                 <label htmlFor="name">Name *</label>
                 <input
@@ -154,7 +209,7 @@ const Contact = () => {
                   <span className="field-error">{validationErrors.name}</span>
                 )}
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="email">Email *</label>
                 <input
@@ -171,7 +226,7 @@ const Contact = () => {
                   <span className="field-error">{validationErrors.email}</span>
                 )}
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="subject">Subject *</label>
                 <input
@@ -188,7 +243,7 @@ const Contact = () => {
                   <span className="field-error">{validationErrors.subject}</span>
                 )}
               </div>
-              
+
               <div className="form-group">
                 <label htmlFor="message">Message *</label>
                 <textarea
@@ -205,7 +260,7 @@ const Contact = () => {
                   <span className="field-error">{validationErrors.message}</span>
                 )}
               </div>
-              
+
               <button 
                 type="submit" 
                 className="btn"

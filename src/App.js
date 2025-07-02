@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Hero from './components/Hero/Hero';
 import About from './components/About/About';
@@ -12,7 +13,8 @@ import EasterEgg from './components/EasterEgg/EasterEgg';
 import HealthCheck from './components/HealthCheck/HealthCheck';
 import './App.css';
 
-function App() {
+// Main Portfolio Component
+const Portfolio = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const handleLoadingComplete = () => {
@@ -20,39 +22,52 @@ function App() {
   };
 
   useEffect(() => {
-    if (isLoading) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    if (!isLoading) {
+      const timer = setTimeout(() => {
+        const heroSection = document.getElementById('hero');
+        if (heroSection) {
+          heroSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
 
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
+      return () => clearTimeout(timer);
+    }
   }, [isLoading]);
 
   return (
     <div className="App">
       <HealthCheck />
-      
+
       {isLoading && <LoadingScreen onLoadingComplete={handleLoadingComplete} />}
-      
+
       {!isLoading && (
         <>
-          <Header />
-          <main>
-            <Hero />
-            <About />
-            <Skills />
-            <Projects />
-            <Contact />
-          </main>
-          <Footer />
           <PageViews />
+          <Header />
+          <Hero />
+          <About />
+          <Skills />
+          <Projects />
+          <Contact />
+          <Footer />
           <EasterEgg />
         </>
       )}
     </div>
+  );
+};
+
+function App() {
+  return (
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<Portfolio />} />
+          {/* Catch all route */}
+          <Route path="*" element={<Portfolio />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
