@@ -36,7 +36,7 @@ export const portfolioData = {
   projects: [
     {
       id: 1,
-      title: "Real-Time Video Chat App",
+      title: "Video-call app",
       description: "A modern video calling application enabling instant peer-to-peer communication through web browsers. Features room-based meetings, audio/video controls, multi-user support, and responsive design that works seamlessly across desktop and mobile devices.",
       technologies: ["React", "Node.js", "Socket.io", "WebRTC", "Express", "CSS3"],
       gradient: "linear-gradient(135deg, #10b981, #3b82f6)",
