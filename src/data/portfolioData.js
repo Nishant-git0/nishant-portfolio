@@ -36,12 +36,12 @@ export const portfolioData = {
   projects: [
     {
       id: 1,
-      title: "E-Commerce Mobile App",
-      description: "A feature-rich e-commerce application built with Flutter featuring product listings, cart management, payment integration, and user reviews.",
-      technologies: ["Flutter", "Firebase", "Dart", "UI/UX"],
-      gradient: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-      demoUrl: "#",
-      sourceUrl: "#",
+      title: "Real-Time Video Chat App",
+      description: "A modern video calling application enabling instant peer-to-peer communication through web browsers. Features room-based meetings, audio/video controls, multi-user support, and responsive design that works seamlessly across desktop and mobile devices.",
+      technologies: ["React", "Node.js", "Socket.io", "WebRTC", "Express", "CSS3"],
+      gradient: "linear-gradient(135deg, #10b981, #3b82f6)",
+      demoUrl: "https://video-chat-app-i16z.onrender.com/",
+      sourceUrl: "https://github.com/Nishant-git0/video-chat-app.git",
       featured: true
     },
     {
