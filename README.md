@@ -1,27 +1,30 @@
 # Nishant Thakur - Portfolio Website
 
-A modern, responsive portfolio website built with React showcasing software development skills and projects.
+A modern, responsive portfolio website with React frontend and Node.js backend, showcasing my professional skills and projects.
 
-## 🚀 Features
+## ✨ Features
 
-- **Responsive Design**: Optimized for all device sizes
-- **Modern UI/UX**: Clean, professional design with smooth animations
-- **Interactive Elements**: Hover effects, scroll animations, and dynamic content
-- **Accessibility**: WCAG compliant with proper ARIA labels and keyboard navigation
-- **Performance Optimized**: Fast loading with optimized assets
-- **SEO Friendly**: Proper meta tags and semantic HTML
+- **Responsive Design**: Fully adaptive layout for all devices
+- **Modern UI/UX**: Clean interface with smooth animations
+- **Dynamic Content**: Interactive project showcases
+- **Performance Optimized**: Fast loading with lazy loading
+- **SEO Ready**: Proper meta tags and semantic structure
+- **Contact Form**: Backend-powered messaging system
 
-## 🛠️ Technologies Used
+## 🖥️ Tech Stack
 
-- **Frontend**: React 18, CSS3, HTML5
-- **Animations**: CSS animations and transitions
-- **Icons**: Font Awesome
-- **Fonts**: Google Fonts (Poppins, Roboto Mono)
-- **Build Tool**: Create React App
+### Frontend
+| Technology | Purpose |
+|------------|---------|
+| React 18   | UI Framework |
+| CSS3       | Styling |
+| Framer Motion | Animations |
+| Font Awesome | Icons |
 
-## 📦 Installation
+### Backend
+| Technology | Purpose |
+|------------|---------|
+| Node.js    | Server Environment |
+| Express    | API Routes |
+| Nodemailer | Email handling |
 
-1. Clone the repository:
-```bash
-git clone https://github.com/nishantthakur/portfolio.git
-cd portfolio
